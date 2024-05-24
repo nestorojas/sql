@@ -17,6 +17,10 @@ The `||` values concatenate the columns into strings.
 Edit the appropriate columns -- you're making two edits -- and the NULL rows will be fixed. 
 All the other rows will remain the same.) */
 
+SELECT product_name AS "Product Name",
+       COALESCE(product_size, '') AS "Size",
+       ' (' || COALESCE(product_qty_type, 'unit') || ')' AS "Unit"
+FROM product;
 
 
 
@@ -30,11 +34,71 @@ each new market date for each customer, or select only the unique market dates p
 (without purchase details) and number those visits. 
 HINT: One of these approaches uses ROW_NUMBER() and one uses DENSE_RANK(). */
 
+--Approach 1: Selecting All Rows with Visit Numbers (ROW_NUMBER())
+SELECT cp.customer_id,
+       cp.market_date,
+       -- Other columns from customer_purchases (if needed)
+       ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY market_date) AS visit_number
+FROM customer_purchases cp;
+
+--Selecting Unique Market Dates with Visit Numbers (DENSE_RANK())
+SELECT customer_id,
+       market_date,
+       DENSE_RANK() OVER (PARTITION BY customer_id ORDER BY market_date) AS visit_number
+FROM (
+  SELECT customer_id, market_date
+  FROM customer_purchases
+  GROUP BY customer_id, market_date
+) AS unique_visits;
+
+
 
 /* 2. Reverse the numbering of the query from a part so each customer’s most recent visit is labeled 1, 
 then write another query that uses this one as a subquery (or temp table) and filters the results to 
 only the customer’s most recent visit. */
 
+--Reverse Using DENSE_RANK()
+SELECT customer_id,
+       market_date,
+       DENSE_RANK() OVER (PARTITION BY customer_id ORDER BY market_date) AS visit_number
+FROM (
+  SELECT customer_id, market_date
+  FROM customer_purchases
+  GROUP BY customer_id, market_date
+) AS unique_visits
+ORDER BY customer_id, visit_number;
+
+--query using subquery with ROW_NUMBER()
+
+SELECT c.product_id,
+c.vendor_id,
+c.market_date AS "Most Recent Visit Date",
+c.customer_id,
+c.quantity,
+c.cost_to_customer_per_qty,
+c.transaction_time
+FROM customer_purchases c
+INNER JOIN (
+  SELECT customer_id, market_date
+  FROM (
+    SELECT customer_id, market_date,
+           ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY market_date DESC) AS visit_number
+    FROM customer_purchases
+  ) AS ranked_visits
+  WHERE visit_number = 1
+) AS most_recent ON c.customer_id = most_recent.customer_id
+AND c.market_date = most_recent.market_date
+ORDER BY c.market_date DESC;
+
 
 /* 3. Using a COUNT() window function, include a value along with each row of the 
 customer_purchases table that indicates how many different times that customer has purchased that product_id. */
+SELECT c.product_id,
+c.vendor_id,
+c.market_date,
+c.customer_id,
+c.quantity,
+c.cost_to_customer_per_qty,
+c.transaction_time,
+COUNT(*) OVER (PARTITION BY customer_id, product_id) AS purchase_count
+FROM customer_purchases c;
