@@ -19,9 +19,83 @@ The store wants to keep customer addresses. Propose two architectures for the CU
 _Hint, search type 1 vs type 2 slowly changing dimensions._
 
 Bonus: Are there privacy implications to this, why or why not?
+
+1. Overwriting Architecture (Type 1 SCD):
+   Type 1 Slowly Changing Dimension (SCD)
 ```
-Your answer...
+CREATE TABLE Customer_Address (
+  customer_id INT PRIMARY KEY FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+  address_line1 VARCHAR(255) NOT NULL,
+  address_line2 VARCHAR(255),
+  city VARCHAR(255) NOT NULL,
+  state VARCHAR(50) NOT NULL,
+  postal_code VARCHAR(20) NOT NULL
+);
+
 ```
+Explanation:
+This table stores the current address information for each customer.
+When a customer's address changes, the existing record is overwritten with the new information.
+No historical data about past addresses is maintained.
+
+Benefits:
+Simple to implement and manage.
+Less storage space required.
+
+Drawbacks:
+Loses historical information about customer addresses.
+If the Customer order requires an Address, then it should be stored in the transaction table (Order).
+
+2. Historical Architecture (Type 2 SCD):
+   Type 2 Slowly Changing Dimension (SCD)
+```
+CREATE TABLE Customer_Address (
+  customer_id INT PRIMARY KEY FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+  address_line1 VARCHAR(255) NOT NULL,
+  address_line2 VARCHAR(255),
+  city VARCHAR(255) NOT NULL,
+  state VARCHAR(50) NOT NULL,
+  postal_code VARCHAR(20) NOT NULL,
+  valid_from DATE NOT NULL DEFAULT CURRENT_DATE,
+  valid_to DATE DEFAULT NULL
+);
+```
+Explanation:
+This table stores historical address information for each customer.
+When a customer's address changes, perhaps a Customer form is created and current address is retrieved, then, a new record is inserted with the new information and a valid_from date set to the current date.
+
+The existing record's valid_to date is updated to the day before the new address becomes valid.
+This allows you to track all the addresses a customer has had over time.
+
+Benefits:
+Maintains a complete history of customer addresses.
+Enables analysis of customer relocation trends.
+
+Drawbacks:
+More complex to manage and requires additional storage space.
+Queries might need to consider the valid_from and valid_to dates for accurate results.
+
+### BONUS:
+Privacy Implications of Storing Customer Addresses
+
+Storing customer addresses does have privacy implications to consider.  The chosen architecture (how you store the data) might require additional actions to comply with customer rights and local regulations. This is especially true when opting for the historical approach (Type 2 Slowly Changing Dimension - SCD). Here's a breakdown:
+
+Type 1 SCD (Overwriting Address):
+
+Lower Privacy Risk: This model stores only the current address, minimizing the amount of personal information retained. It's less likely to raise privacy concerns as long as you have proper data security measures in place.
+Type 2 SCD (Historical):
+
+Higher Privacy Risk:  This approach keeps a history of all customer addresses, which can be considered more sensitive data. Here are some preventative actions to consider:
+
+Data Retention: Storing historical data increases the amount of customer information you hold. This approach requires stricter data retention policies and disposal procedures.
+Regulations: Customers have rights to access, rectify, or request deletion of their historical address information. You need to implement mechanisms to address such requests.
+Security Risks: A larger data footprint increases the potential attack surface for breaches or unauthorized access. Implementing strong security measures is crucial.
+General Privacy Considerations:
+
+Regardless of the chosen architecture:
+
+Customer Consent: Obtain customer consent for collecting and storing address information, especially if you plan to use it for purposes beyond order fulfillment.
+
 
 ## Question 4
 Review the AdventureWorks Schema [here](https://i.stack.imgur.com/LMu4W.gif)
