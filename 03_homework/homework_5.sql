@@ -86,7 +86,6 @@ SELECT
 FROM 
     MinSales;
 
-
 -- Cross Join
 /*1. Suppose every vendor in the `vendor_inventory` table had 5 of each of their products to sell to **every** 
 customer on record. How much money would each vendor make per product? 
