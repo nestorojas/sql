@@ -66,15 +66,15 @@ Lower Privacy Risk: This model stores only the current address, minimizing the a
 
 Type 2 SCD (Historical):
 
-Higher Privacy Risk:  This approach keeps a history of all customer addresses, which can be considered more sensitive data. Here are some preventative actions to consider:
+Higher Privacy Risk:  This approach keeps a history of all customer addresses, which can be considered more sensitive data. Here are some preventative actions to consider:<br/>
 
-Data Retention: Storing historical data increases the amount of customer information you hold. This approach requires stricter data retention policies and disposal procedures.
-Regulations: Customers have rights to access, rectify, or request deletion of their historical address information. You need to implement mechanisms to address such requests.
-Security Risks: A larger data footprint increases the potential attack surface for breaches or unauthorized access. Implementing strong security measures is crucial.
-General Privacy Considerations:
+Data Retention: Storing historical data increases the amount of customer information you hold. This approach requires stricter data retention policies and disposal procedures.<br/>
+
+Regulations: Customers have rights to access, rectify, or request deletion of their historical address information. You need to implement mechanisms to address such requests.<br/>
+
+Security Risks: A larger data footprint increases the potential attack surface for breaches or unauthorized access. Implementing strong security measures is crucial.<br/>
 
 Regardless of the chosen architecture:
-
 Customer Consent: Obtain customer consent for collecting and storing address information, especially if you plan to use it for purposes beyond order fulfillment.
 
 
