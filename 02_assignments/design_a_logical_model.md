@@ -62,7 +62,8 @@ Storing customer addresses does have privacy implications to consider.  The chos
 
 Type 1 SCD (Overwriting Address):
 
-Lower Privacy Risk: This model stores only the current address, minimizing the amount of personal information retained. It's less likely to raise privacy concerns as long as you have proper data security measures in place.
+Lower Privacy Risk: This model stores only the current address, minimizing the amount of personal information retained. It's less likely to raise privacy concerns as long as you have proper data security measures in place.<br/>
+
 Type 2 SCD (Historical):
 
 Higher Privacy Risk:  This approach keeps a history of all customer addresses, which can be considered more sensitive data. Here are some preventative actions to consider:
