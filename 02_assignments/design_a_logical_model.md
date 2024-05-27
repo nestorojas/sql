@@ -23,18 +23,7 @@ Bonus: Are there privacy implications to this, why or why not?
 1. Overwriting Architecture (Type 1 SCD):
    Type 1 Slowly Changing Dimension (SCD)
 ```
-CREATE TABLE Customer_Address (
-  customer_id INT PRIMARY KEY FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
-  address_line1 VARCHAR(255) NOT NULL,
-  address_line2 VARCHAR(255),
-  city VARCHAR(255) NOT NULL,
-  state VARCHAR(50) NOT NULL,
-  postal_code VARCHAR(20) NOT NULL
-);
-
-```
-Explanation:
-This table stores the current address information for each customer.
+In this architectural model the current address information for each customer is stored.
 When a customer's address changes, the existing record is overwritten with the new information.
 No historical data about past addresses is maintained.
 
@@ -46,22 +35,12 @@ Drawbacks:
 Loses historical information about customer addresses.
 If the Customer order requires an Address, then it should be stored in the transaction table (Order).
 
+```
+
 2. Historical Architecture (Type 2 SCD):
    Type 2 Slowly Changing Dimension (SCD)
-```
-CREATE TABLE Customer_Address (
-  customer_id INT PRIMARY KEY FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
-  address_line1 VARCHAR(255) NOT NULL,
-  address_line2 VARCHAR(255),
-  city VARCHAR(255) NOT NULL,
-  state VARCHAR(50) NOT NULL,
-  postal_code VARCHAR(20) NOT NULL,
-  valid_from DATE NOT NULL DEFAULT CURRENT_DATE,
-  valid_to DATE DEFAULT NULL
-);
-```
-Explanation:
-This table stores historical address information for each customer.
+```Explanation:
+In this architectural model historical address information for each customer is stored.
 When a customer's address changes, perhaps a Customer form is created and current address is retrieved, then, a new record is inserted with the new information and a valid_from date set to the current date.
 
 The existing record's valid_to date is updated to the day before the new address becomes valid.
@@ -75,6 +54,7 @@ Drawbacks:
 More complex to manage and requires additional storage space.
 Queries might need to consider the valid_from and valid_to dates for accurate results.
 
+```
 ### BONUS:
 Privacy Implications of Storing Customer Addresses
 
@@ -102,7 +82,21 @@ Review the AdventureWorks Schema [here](https://i.stack.imgur.com/LMu4W.gif)
 
 Highlight at least two differences between it and your ERD. Would you change anything in yours?
 ```
-Your answer...
+
+1. Focus:
+
+Bookstore Database: Tailored to the core functions of a bookstore, like managing customers, employees, books, orders, and sales.
+AdventureWorks: More comprehensive, encompassing a complete sales and purchasing cycle for a fictional manufacturing company.
+
+2. Visual Representation:
+
+Bookstore Database: Focuses on the core bookstore entities, without color-coding departments.
+AdventureWorks: Utilizes color coding to visually distinguish tables associated with different departments (e.g., green for Sales, blue for Purchasing).
+
+3. Scope:
+
+Bookstore Database: Designed specifically to meet the business needs of a bookstore.
+AdventureWorks: Provides a broader sample database schema applicable to a manufacturing environment.
 ```
 
 # Criteria
