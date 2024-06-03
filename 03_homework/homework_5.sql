@@ -221,41 +221,25 @@ Finally, make sure you have a WHERE statement to update the right row,
 When you have all of these components, you can run the update statement. */
 
 ALTER TABLE product_units
-ADD current_quantity INT Default 0;
+ADD current_quantity INT;
 
-UPDATE product_units AS pu
+UPDATE product_units
 SET current_quantity = (
-    SELECT COALESCE(quantity, 0)
-    FROM (
-        SELECT 
-            vendor_id,
-            product_id,
-            COALESCE(quantity, 0) AS quantity,
-            MAX(market_date) AS last_reported_date
-        FROM 
-            vendor_inventory
-        GROUP BY 
-            vendor_id,
-            product_id
-    ) AS vi
-    WHERE vi.product_id = pu.product_id
-)
-WHERE EXISTS (
-    SELECT 1
-    FROM (
-        SELECT 
-            vendor_id,
-            product_id,
-            quantity,
-            MAX(market_date) AS last_reported_date
-        FROM 
-            vendor_inventory
-        GROUP BY 
-            vendor_id,
-            product_id
-    ) AS vi
-    WHERE vi.product_id = pu.product_id
-);
+SELECT current_quantity
+FROM (
+SELECT p.product_id, COALESCE(quantity,0) as current_quantity
+
+	FROM product_units p
+	LEFT JOIN (
+		SELECT *
+		,ROW_NUMBER() OVER( PARTITION BY vi.product_id ORDER BY market_date DESC) AS rn
+		FROM vendor_inventory vi 
+	) vi ON p.product_id  = vi.product_id
+
+	WHERE rn = 1 
+	OR rn IS NULL
+) p
+WHERE product_units.product_id = p.product_id);
 
 
 
